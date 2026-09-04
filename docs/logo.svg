@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 90" fill="none">
+  <defs>
+    <linearGradient id="logo-blue" x1="12" y1="12" x2="72" y2="72" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" />
+      <stop offset="0.5" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#1D4ED8" />
+    </linearGradient>
+    <linearGradient id="logo-cyan" x1="24" y1="68" x2="68" y2="16" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06B6D4" />
+      <stop offset="1" stop-color="#60A5FA" />
+    </linearGradient>
+  </defs>
+
+  <!-- Geometric Mark Background Container -->
+  <rect x="8" y="10" width="70" height="70" rx="16" fill="#0B0F17" stroke="#1E293B" stroke-width="1.5" />
+
+  <!-- Adaptive Loop & Checkmark Geometry -->
+  <path
+    d="M21 54C18 49.5 16 44 16 38C16 26 26 16 38 16C49 16 58.5 24 60 35"
+    stroke="url(#logo-blue)"
+    stroke-width="7"
+    stroke-linecap="round"
+  />
+  <path
+    d="M26 44L36 54C39 57 44 57 47 54L68 31"
+    stroke="url(#logo-cyan)"
+    stroke-width="7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <circle cx="38" cy="37" r="5" fill="#38BDF8" />
+
+  <!-- Typography: AdaptiveAI Wordmark -->
+  <text x="96" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Geist', sans-serif" font-size="32" font-weight="700" fill="#0F172A" letter-spacing="-0.03em">
+    Adaptive<tspan fill="#2563EB" font-weight="800">AI</tspan>
+  </text>
+
+  <!-- Subtitle: Finance Controller -->
+  <text x="98" y="68" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Geist', sans-serif" font-size="11" font-weight="600" fill="#64748B" letter-spacing="0.16em">
+    FINANCE CONTROLLER
+  </text>
+</svg>

@@ -1,0 +1,25 @@
+.venv
+.env
+secrets/
+.worktrees/
+.DS_Store
+.playwright-mcp/
+.claude
+.mcp.json
+CLAUDE.md
+docs/plans/
+tmp/
+docker-compose.override.yml
+
+# Ignore local configuration files
+.vscode/
+
+# Runtime artifacts written by the agents feature (uploaded KB files,
+# downloaded ONNX embedding models, transaction attachments). User data
+# — never commit.
+backend/data/
+
+# Runtime database dumps and logs
+dump.rdb
+*.log
+

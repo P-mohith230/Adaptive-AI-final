@@ -1,0 +1,354 @@
+import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import {
+  Upload,
+  Download,
+  Play,
+  CheckCircle2,
+  RefreshCw,
+  ShieldCheck,
+  Building2,
+  Receipt,
+  FileDown,
+  Sparkles,
+  ArrowRight,
+} from 'lucide-react'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { reconciliation } from '@/lib/api'
+
+export function ReconciliationBatchImportPanel() {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  const [activeTab, setActiveTab] = useState<'generate' | 'upload'>('generate')
+  const [recordCount, setRecordCount] = useState('100')
+  const [ordersFile, setOrdersFile] = useState<File | null>(null)
+  const [paymentsFile, setPaymentsFile] = useState<File | null>(null)
+  const [bankFile, setBankFile] = useState<File | null>(null)
+  const [resultData, setResultData] = useState<any | null>(null)
+
+  // 1. Download sample CSV files
+  const downloadSampleMutation = useMutation({
+    mutationFn: async (total: number) => {
+      return await reconciliation.getSampleCsvs(total)
+    },
+    onSuccess: (data) => {
+      const downloadFile = (content: string, filename: string) => {
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', filename)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+
+      if (data.merchant_orders_csv) downloadFile(data.merchant_orders_csv, 'merchant_orders_sample.csv')
+      if (data.razorpay_payments_csv) downloadFile(data.razorpay_payments_csv, 'razorpay_payments_sample.csv')
+      if (data.bank_settlement_csv) downloadFile(data.bank_settlement_csv, 'bank_settlement_sample.csv')
+
+      toast.success('Sample CSV templates downloaded successfully!')
+    },
+    onError: (err: any) => {
+      toast.error('Failed to download templates', { description: err.message })
+    },
+  })
+
+  // 2. Generate & Reconcile Synthetic Batch
+  const generateBatchMutation = useMutation({
+    mutationFn: async (count: number) => {
+      const sample = await reconciliation.getSampleCsvs(count)
+      return await reconciliation.importCsvBatch(
+        sample.merchant_orders_csv,
+        sample.razorpay_payments_csv,
+        sample.bank_settlement_csv
+      )
+    },
+    onSuccess: (res) => {
+      setResultData(res)
+      toast.success(`Batch processed: ${res.matched_records}/${res.total_records} matched!`, {
+        description: `Synced to AdaptiveAI general ledger (${res.ledger_sync?.synced_clean || 0} clean entries).`,
+      })
+      queryClient.invalidateQueries({ queryKey: ['reconciliation-kpi'] })
+      queryClient.invalidateQueries({ queryKey: ['reconciliation-records'] })
+      queryClient.invalidateQueries({ queryKey: ['reconciliation-batches'] })
+      queryClient.invalidateQueries({ queryKey: ['cash-forecast'] })
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    },
+    onError: (err: any) => {
+      toast.error('Batch generation failed', { description: err.message })
+    },
+  })
+
+  // 3. Upload & Ingest User CSV files
+  const uploadBatchMutation = useMutation({
+    mutationFn: async () => {
+      if (!ordersFile || !paymentsFile) {
+        throw new Error('Please select both Merchant Orders and Razorpay Payments CSV files.')
+      }
+
+      const ordersText = await ordersFile.text()
+      const paymentsText = await paymentsFile.text()
+      const bankText = bankFile ? await bankFile.text() : undefined
+
+      return await reconciliation.importCsvBatch(ordersText, paymentsText, bankText)
+    },
+    onSuccess: (res) => {
+      setResultData(res)
+      toast.success(`Batch reconciled: ${(Number(res.match_rate) * 100).toFixed(1)}% match rate!`, {
+        description: 'Synchronized with AdaptiveAI general ledger.',
+      })
+      queryClient.invalidateQueries({ queryKey: ['reconciliation-kpi'] })
+      queryClient.invalidateQueries({ queryKey: ['reconciliation-records'] })
+      queryClient.invalidateQueries({ queryKey: ['reconciliation-batches'] })
+      queryClient.invalidateQueries({ queryKey: ['cash-forecast'] })
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    },
+    onError: (err: any) => {
+      toast.error('Upload failed', { description: err.message })
+    },
+  })
+
+  return (
+    <div className="space-y-6">
+      {/* Informational Hero Card */}
+      <Card className="border-primary/20 bg-gradient-to-br from-card to-primary/5">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+              Razorpay Track 04
+            </Badge>
+            <Badge variant="secondary" className="font-mono text-xs flex items-center gap-1">
+              <Sparkles className="h-3 w-3 text-purple-500" />
+              Automated 3-Way Reconciliation
+            </Badge>
+          </div>
+          <CardTitle className="text-xl font-bold tracking-tight">
+            3-Way Financial Reconciliation Batch Importer
+          </CardTitle>
+          <CardDescription>
+            Seamlessly import or generate 50+ record batches of Merchant Orders, Razorpay Captured Payments, and Bank Settlements.
+            Calculates verified match rate, identifies anomalies, and syncs directly with AdaptiveAI double-entry core ledger.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      {/* Results Banner if completed */}
+      {resultData && (
+        <Card className="border-emerald-500/30 bg-emerald-500/5">
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                <span className="font-semibold text-foreground text-base">Reconciliation Loop Completed</span>
+              </div>
+              <Badge className="bg-emerald-500/20 text-emerald-600 border-emerald-500/40 text-sm py-1">
+                Match Rate: {(Number(resultData.match_rate) * 100).toFixed(1)}%
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="bg-background/80 p-3 rounded-lg border">
+                <div className="text-muted-foreground">Total Ingested</div>
+                <div className="text-lg font-bold text-foreground">{resultData.total_records}</div>
+              </div>
+              <div className="bg-background/80 p-3 rounded-lg border">
+                <div className="text-muted-foreground">Deterministic Matches</div>
+                <div className="text-lg font-bold text-emerald-500">{resultData.matched_records}</div>
+              </div>
+              <div className="bg-background/80 p-3 rounded-lg border">
+                <div className="text-muted-foreground">Exceptions Detected</div>
+                <div className="text-lg font-bold text-amber-500">{resultData.unresolved_count}</div>
+              </div>
+              <div className="bg-background/80 p-3 rounded-lg border">
+                <div className="text-muted-foreground">AdaptiveAI Ledger Synced</div>
+                <div className="text-lg font-bold text-primary">
+                  {(resultData.ledger_sync?.synced_clean || 0) + (resultData.ledger_sync?.synced_exceptions || 0)} entries
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <Button size="sm" className="gap-1.5" onClick={() => navigate('/reconciliation')}>
+                <ShieldCheck className="h-4 w-4" />
+                Inspect Exceptions in Workstation
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+              <Button size="sm" variant="outline" className="gap-1.5" onClick={() => navigate('/transactions')}>
+                <Receipt className="h-4 w-4 text-sky-500" />
+                View in General Ledger Transactions (/transactions)
+              </Button>
+              <Button size="sm" variant="outline" className="gap-1.5" onClick={() => navigate('/accounts')}>
+                <Building2 className="h-4 w-4 text-emerald-500" />
+                Check Bank & Clearing Accounts (/accounts)
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Main Tabs */}
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="generate">Instant 50+ Synthetic Batch</TabsTrigger>
+          <TabsTrigger value="upload">Upload Custom CSV Files</TabsTrigger>
+        </TabsList>
+
+        {/* Tab 1: Instant Synthetic Batch */}
+        <TabsContent value="generate" className="space-y-4 pt-4">
+          <Card>
+            <CardContent className="p-5 space-y-4">
+              <div>
+                <h4 className="font-semibold text-foreground text-sm">Autonomous Synthetic Generator</h4>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Generates an end-to-end dataset with realistic merchant orders, Razorpay MDR fees, GST tax, and bank settlements with real-world edge-cases (amount delta, fee mismatches, timing float).
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-end gap-3 pt-2">
+                <div className="w-full sm:w-56 space-y-1.5">
+                  <Label className="text-xs font-semibold text-foreground">Batch Size</Label>
+                  <Select value={recordCount} onValueChange={setRecordCount}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder="Select size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="50">50 Records (Track 04 min)</SelectItem>
+                      <SelectItem value="100">100 Records (Standard)</SelectItem>
+                      <SelectItem value="150">150 Records (Heavy load)</SelectItem>
+                      <SelectItem value="250">250 Records (Stress test)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button
+                  className="h-10 w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-medium shadow-sm px-5"
+                  onClick={() => generateBatchMutation.mutate(parseInt(recordCount, 10))}
+                  disabled={generateBatchMutation.isPending}
+                >
+                  {generateBatchMutation.isPending ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      Generating & Reconciling...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4 fill-current" />
+                      Run 3-Way Reconciliation & Sync Ledger
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <div className="flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
+                <span>Need offline CSV files for external inspection or tests?</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 text-xs"
+                  onClick={() => downloadSampleMutation.mutate(parseInt(recordCount, 10))}
+                  disabled={downloadSampleMutation.isPending}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Download 3 Sample CSV Files
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tab 2: Upload Custom CSVs */}
+        <TabsContent value="upload" className="space-y-4 pt-4">
+          <Card>
+            <CardContent className="p-5 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-3">
+                {/* 1. Orders */}
+                <div className="border rounded-lg p-3 space-y-2">
+                  <div>
+                    <Label className="text-xs font-semibold text-foreground">1. Merchant Orders CSV *</Label>
+                    <p className="text-[10px] text-muted-foreground">order_id, invoice_id, gross_amount, customer_email...</p>
+                  </div>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 w-full"
+                    onChange={(e) => setOrdersFile(e.target.files?.[0] || null)}
+                  />
+                </div>
+
+                {/* 2. Payments */}
+                <div className="border rounded-lg p-3 space-y-2">
+                  <div>
+                    <Label className="text-xs font-semibold text-foreground">2. Razorpay Payments CSV *</Label>
+                    <p className="text-[10px] text-muted-foreground">payment_id, order_id, amount, fee, tax, status...</p>
+                  </div>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 w-full"
+                    onChange={(e) => setPaymentsFile(e.target.files?.[0] || null)}
+                  />
+                </div>
+
+                {/* 3. Bank Settlement */}
+                <div className="border rounded-lg p-3 space-y-2">
+                  <div>
+                    <Label className="text-xs font-semibold text-foreground">3. Bank Statement CSV (Optional)</Label>
+                    <p className="text-[10px] text-muted-foreground">settlement_utr, settlement_id, net_credit_amount...</p>
+                  </div>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 w-full"
+                    onChange={(e) => setBankFile(e.target.files?.[0] || null)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between border-t pt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 text-xs"
+                  onClick={() => downloadSampleMutation.mutate(50)}
+                  disabled={downloadSampleMutation.isPending}
+                >
+                  <FileDown className="h-3.5 w-3.5" />
+                  Download Sample CSV Templates
+                </Button>
+
+                <Button
+                  className="gap-2"
+                  onClick={() => uploadBatchMutation.mutate()}
+                  disabled={uploadBatchMutation.isPending || !ordersFile || !paymentsFile}
+                >
+                  {uploadBatchMutation.isPending ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      Ingesting & Reconciling...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      Ingest & Reconcile
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
