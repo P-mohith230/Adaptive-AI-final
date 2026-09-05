@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Database
-    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/securo"
+    database_url: str = getenv("DATABASE_URL") or getenv("POSTGRES_URL") or "postgresql+asyncpg://postgres:postgres@localhost:5432/securo"
 
     # Auth
     secret_key: SecretStr = SecretStr("change-me-in-production")
@@ -137,6 +137,20 @@ class Settings(BaseSettings):
     @property
     def oidc_login_available(self) -> bool:
         return bool(self.oidc_enabled and self.oidc_client_id and self.oidc_discovery_url)
+
+    @model_validator(mode="after")
+    def normalize_database_url(self) -> "Settings":
+        url = self.database_url
+        if not url:
+            url = getenv("DATABASE_URL") or getenv("POSTGRES_URL") or "postgresql+asyncpg://postgres:postgres@localhost:5432/securo"
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://") and not url.startswith("postgresql+asyncpg://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        if "sslmode=require" in url:
+            url = url.replace("sslmode=require", "ssl=require")
+        self.database_url = url
+        return self
 
     @model_validator(mode="after")
     def validate_auth_settings(self) -> "Settings":

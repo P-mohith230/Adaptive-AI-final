@@ -90,6 +90,18 @@ async def _warm_tesouro_cache() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Auto-initialize database tables if database is connected (Neon, Supabase, Vercel Postgres)
+    try:
+        from app.core.database import Base, engine
+        from app import models as _app_models  # noqa: F401
+        from app.agents import models as _agent_models  # noqa: F401
+
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Startup: database tables verified/created successfully")
+    except Exception as e:
+        logger.warning(f"Startup: database initialization skipped or deferred: {e}")
+
     # Startup: dispatch sync for all stale bank connections
     try:
         from app.worker import celery_app  # noqa: F811
