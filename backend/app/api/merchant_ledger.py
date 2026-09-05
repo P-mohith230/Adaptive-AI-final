@@ -4,7 +4,7 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_async_session
-from app.core.workspace_context import WorkspaceContext, current_workspace
+from app.core.workspace_context import WorkspaceContext, current_workspace, current_writable_workspace
 from app.integrations.razorpay.client import RazorpayClient
 from app.integrations.razorpay.normalizer import RazorpayNormalizer
 from app.models.canonical_transaction import CanonicalTransaction
@@ -35,11 +35,10 @@ async def list_ledger_entries(
 @router.post("/entries", response_model=MerchantLedgerEntryRead)
 async def create_ledger_entry(
     payload: MerchantLedgerEntryCreate,
-    ctx: WorkspaceContext = Depends(current_workspace),
+    ctx: WorkspaceContext = Depends(current_writable_workspace),
     session: AsyncSession = Depends(get_async_session),
 ):
     """Creates a new expected order in the merchant internal ledger."""
-    ctx.require_write()
     entry = MerchantLedgerEntry(
         workspace_id=ctx.id,
         order_id=payload.order_id,
@@ -63,11 +62,10 @@ async def create_ledger_entry(
 
 @router.post("/sync-razorpay")
 async def sync_razorpay_gateway_records(
-    ctx: WorkspaceContext = Depends(current_workspace),
+    ctx: WorkspaceContext = Depends(current_writable_workspace),
     session: AsyncSession = Depends(get_async_session),
 ):
     """Connects to Razorpay API and synchronizes live test-mode payments and settlements."""
-    ctx.require_write()
     client = RazorpayClient()
     synced_payments = 0
     synced_settlements = 0

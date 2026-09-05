@@ -94,6 +94,12 @@ ALLOWLIST: dict[tuple[str, str], str] = {
     # touched. Flagged here so a future rate limit or admin floor is a
     # decision rather than an oversight.
     ("POST", "/api/fx-rates/refresh"): "refreshes instance-wide FX rates, no workspace data",
+    # Body-shaped reads: these endpoints use POST for payload transport, not
+    # because they mutate workspace state.
+    ("POST", "/api/reconciliation/settlement-qa"): "reads analytics context and returns a Q&A response",
+    # External system ingress: Razorpay webhook writes are authorized by
+    # signature verification, not by workspace membership.
+    ("POST", "/api/webhooks/razorpay"): "Razorpay-signed webhook ingestion path",
 }
 
 

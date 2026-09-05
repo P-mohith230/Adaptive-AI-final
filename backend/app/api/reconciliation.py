@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_async_session
-from app.core.workspace_context import WorkspaceContext, current_workspace
+from app.core.workspace_context import WorkspaceContext, current_workspace, current_writable_workspace
 from app.models.canonical_transaction import CanonicalTransaction
 from app.models.merchant_ledger import MerchantLedgerEntry
 from app.models.reconciliation import (
@@ -41,7 +41,7 @@ router = APIRouter(prefix="/api/reconciliation", tags=["reconciliation"])
 @router.post("/demo-run", response_model=ReconciliationBatchRead)
 async def run_demo_reconciliation(
     total_records: int = Query(100, ge=50, le=250, description="Batch size for evaluation run"),
-    ctx: WorkspaceContext = Depends(current_workspace),
+    ctx: WorkspaceContext = Depends(current_writable_workspace),
     session: AsyncSession = Depends(get_async_session),
 ):
     """Executes full end-to-end Track 04 finance loop:
@@ -51,7 +51,6 @@ async def run_demo_reconciliation(
     3. AI Exception Investigation & evidence synthesis
     4. Dynamically compute all KPIs and return the completed batch.
     """
-    ctx.require_write()
     batch = await EvaluationService.run_full_demo_loop(
         session=session,
         workspace_id=ctx.id,
@@ -248,14 +247,13 @@ async def get_transaction_decision_card(
 async def review_reconciliation_record(
     record_id: uuid.UUID,
     payload: ReviewActionPayload,
-    ctx: WorkspaceContext = Depends(current_workspace),
+    ctx: WorkspaceContext = Depends(current_writable_workspace),
     session: AsyncSession = Depends(get_async_session),
 ):
     """Human-in-the-loop approval or rejection of an AI proposal.
 
     Appends an immutable audit entry and updates record resolution state.
     """
-    ctx.require_write()
     rec = await session.scalar(
         select(ReconciliationRecord)
         .options(selectinload(ReconciliationRecord.exception))
@@ -349,11 +347,10 @@ async def get_sample_csvs(
 @router.post("/import-csv-batch")
 async def import_csv_batch(
     payload: ImportCsvBatchPayload,
-    ctx: WorkspaceContext = Depends(current_workspace),
+    ctx: WorkspaceContext = Depends(current_writable_workspace),
     session: AsyncSession = Depends(get_async_session),
 ):
     """Uploads and executes 3-way reconciliation across merchant orders, gateway payments, and bank settlements from JSON strings."""
-    ctx.require_write()
     result = await CSVReconciliationGenerator.ingest_csv_batch(
         session=session,
         workspace_id=ctx.id,
@@ -370,11 +367,10 @@ async def upload_csv_batch(
     orders_file: UploadFile = File(...),
     payments_file: UploadFile = File(...),
     bank_file: Optional[UploadFile] = File(None),
-    ctx: WorkspaceContext = Depends(current_workspace),
+    ctx: WorkspaceContext = Depends(current_writable_workspace),
     session: AsyncSession = Depends(get_async_session),
 ):
     """Uploads and executes 3-way reconciliation from uploaded CSV files."""
-    ctx.require_write()
     orders_bytes = await orders_file.read()
     payments_bytes = await payments_file.read()
     bank_bytes = await bank_file.read() if bank_file else None
@@ -397,11 +393,10 @@ async def upload_csv_batch(
 @router.post("/sync-ledger")
 async def sync_latest_batch_to_ledger(
     batch_id: Optional[uuid.UUID] = None,
-    ctx: WorkspaceContext = Depends(current_workspace),
+    ctx: WorkspaceContext = Depends(current_writable_workspace),
     session: AsyncSession = Depends(get_async_session),
 ):
     """Synchronizes a reconciliation batch into Securo's general ledger (Transactions and Accounts)."""
-    ctx.require_write()
     target_batch_id = batch_id
     if not target_batch_id:
         target_batch_id = await session.scalar(
@@ -435,4 +430,3 @@ async def settlement_qa_query(
         question=payload.question,
         history=payload.history,
     )
-
