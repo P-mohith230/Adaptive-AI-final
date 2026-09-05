@@ -48,7 +48,7 @@ We appreciate responsible disclosure of any security vulnerabilities found in Ad
 Please **do not report security issues via public GitHub issues**.
 
 Submit your disclosure via:
-- **Private Security Advisory:** Use the GitHub Security Advisory tab on the repository (`https://github.com/P-mohith230/Adaptive-AI-Finance/security/advisories/new`).
+- **Private Security Advisory:** Use the GitHub Security Advisory tab on the repository (`https://github.com/P-mohith230/Adaptive-AI-final/security/advisories/new`).
 - **Security Contact:** Email: `pagadalamohith85@gmail.com`
 
 ### What to Include

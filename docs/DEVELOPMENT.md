@@ -22,8 +22,8 @@ Before setting up AdaptiveAI Finance Controller, ensure your workstation meets t
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/P-mohith230/Adaptive-AI-Finance.git
-   cd Adaptive-AI-Finance
+   git clone https://github.com/P-mohith230/Adaptive-AI-final.git
+   cd Adaptive-AI-final
    ```
 
 2. **Configure Backend Environment:**

@@ -154,8 +154,8 @@ For complete technical specifications, see [`docs/ARCHITECTURE.md`](./docs/ARCHI
 
 ### 1. Clone & Configure
 ```bash
-git clone https://github.com/P-mohith230/Adaptive-AI-Finance.git
-cd Adaptive-AI-Finance
+git clone https://github.com/P-mohith230/Adaptive-AI-final.git
+cd Adaptive-AI-final
 cp .env.example .env
 ```
 

@@ -14,7 +14,7 @@ success() { echo -e "${GREEN}[OK]${NC} $*"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC} $*"; }
 error()   { echo -e "${RED}[ERROR]${NC} $*"; exit 1; }
 
-REPO_URL="https://github.com/P-mohith230/Adaptive-AI-Finance.git"
+REPO_URL="https://github.com/P-mohith230/Adaptive-AI-final.git"
 COMPOSE_FILE="docker-compose.prod.yml"
 HEALTH_URL="http://localhost:8000/api/health"
 HEALTH_TIMEOUT=60

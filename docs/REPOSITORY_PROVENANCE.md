@@ -2,7 +2,7 @@
 
 **Project:** AdaptiveAI Finance Controller  
 **Upstream Foundation:** Securo (`https://github.com/securo-finance/securo`)  
-**Repository:** `https://github.com/P-mohith230/Adaptive-AI-Finance`  
+**Repository:** `https://github.com/P-mohith230/Adaptive-AI-final`  
 **Date:** September 2026  
 **Auditor:** Senior Git/GitHub Engineer & Open-Source Compliance Specialist
 
