@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from webauthn.helpers import base64url_to_bytes
 
+from app.core.config import get_settings
 from app.models.passkey import UserPasskey
 
 
@@ -85,7 +86,7 @@ async def test_register_and_list_passkey(
     assert options_response.status_code == 200
     options_data = options_response.json()
     assert options_data["challenge_id"]
-    assert options_data["options"]["rp"]["name"] == "Securo"
+    assert options_data["options"]["rp"]["name"] == get_settings().webauthn_rp_name
     assert options_data["options"]["user"]["name"] == test_user.email
 
     verification = SimpleNamespace(
