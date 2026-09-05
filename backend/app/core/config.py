@@ -140,9 +140,17 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def normalize_database_url(self) -> "Settings":
-        url = self.database_url
+        # Prioritize real cloud connection strings over local/default URLs
+        candidates = [
+            getenv("POSTGRES_URL"),
+            getenv("DATABASE_URL"),
+            getenv("STORAGE_URL"),
+            self.database_url,
+        ]
+        url = next((c for c in candidates if c and "localhost" not in c), None)
         if not url:
-            url = getenv("DATABASE_URL") or getenv("POSTGRES_URL") or "postgresql+asyncpg://postgres:postgres@localhost:5432/securo"
+            url = next((c for c in candidates if c), "postgresql+asyncpg://postgres:postgres@localhost:5432/securo")
+
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgresql://") and not url.startswith("postgresql+asyncpg://"):
