@@ -79,8 +79,13 @@ import type {
   InvoiceAttachment,
 } from '@/types'
 
+const rawApiUrl = (import.meta.env.VITE_API_URL as string | undefined)?.trim()
+const apiBaseUrl = rawApiUrl
+  ? `${rawApiUrl.replace(/\/+$/, '')}/api`
+  : '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: apiBaseUrl,
 })
 
 // Storage key for the currently-selected workspace ID. Lives in

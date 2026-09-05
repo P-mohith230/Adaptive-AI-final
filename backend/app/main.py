@@ -113,9 +113,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+cors_allowed_origins = list({
+    settings.frontend_url,
+    "https://frontend-one-sooty-94.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    *(getattr(settings, "cors_origins", []) or []),
+})
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url],
+    allow_origins=cors_allowed_origins,
+    allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

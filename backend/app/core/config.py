@@ -48,7 +48,12 @@ class Settings(BaseSettings):
     simplefin_api_url: str = "https://beta-bridge.simplefin.org"
 
     # Frontend
-    frontend_url: str = "http://localhost:5173"
+    frontend_url: str = "https://frontend-one-sooty-94.vercel.app"
+    cors_origins: list[str] = [
+        "https://frontend-one-sooty-94.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ]
 
     # WebAuthn / passkeys
     webauthn_rp_name: str = "AdaptiveAI Finance"
