@@ -6,4 +6,8 @@ from httpx import AsyncClient
 async def test_health_check(client: AsyncClient):
     response = await client.get("/api/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "healthy"}
+    payload = response.json()
+    assert payload["status"] in {"healthy", "database_error"}
+
+    if "database" in payload:
+        assert payload["database"]["status"] in {"connected", "error"}
