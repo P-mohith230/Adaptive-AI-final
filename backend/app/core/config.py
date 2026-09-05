@@ -140,7 +140,7 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def normalize_database_url(self) -> "Settings":
-        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+        from urllib.parse import parse_qs, urlparse, urlunparse
 
         # Prioritize real cloud connection strings over local/default URLs
         candidates = [
