@@ -1,4 +1,4 @@
-# AdaptiveAI Finance Controller Local Start Script (Legacy compatibility alias)
+# AdaptiveAI Finance Controller Local Start Script
 $ErrorActionPreference = "Continue"
 
 $SCOOP_SHIMS = "$env:USERPROFILE\scoop\shims"
@@ -45,4 +45,4 @@ Start-Sleep -Seconds 3
 Write-Host "`nAll services started successfully!" -ForegroundColor Green
 Write-Host "  - Frontend: http://localhost:5173" -ForegroundColor Cyan
 Write-Host "  - Backend:  http://localhost:8000" -ForegroundColor Cyan
-Write-Host "  - API Docs: http://localhost:8000/api/docs" -ForegroundColor Cyan
+Write-Host "  - API Docs: http://localhost:8000/docs" -ForegroundColor Cyan

@@ -1,10 +1,10 @@
-# Securo: Developer & Architecture Master Manual
+# Securo: Developer & Architecture Master Manual (Historical Upstream Reference)
 
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI%200.141-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![React 19](https://img.shields.io/badge/Frontend-React%2019.2%20%2B%20Vite-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20pgvector-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![MCP](https://img.shields.io/badge/AI-Model%20Context%20Protocol%20(MCP)-8A2BE2)](https://modelcontextprotocol.io/)
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
+> **HISTORICAL REFERENCE NOTICE:**  
+> This document is an archived historical technical manual from the upstream **Securo** project (`v0.15.0`). It is retained for open-source architectural reference and provenance tracking under the GNU AGPL-3.0.  
+> **For the active AdaptiveAI Finance Controller project, please refer to the root [README.md](../../README.md) and [docs/ARCHITECTURE.md](../ARCHITECTURE.md).**
+
+---
 
 **Securo** is a self-hosted, privacy-first personal and business finance platform. It runs on your own infrastructure, offering full financial visibility across accounts, transactions, investments, and invoices without surrendering a single byte to third parties.
 

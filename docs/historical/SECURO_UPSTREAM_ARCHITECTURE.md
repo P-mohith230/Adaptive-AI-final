@@ -1,9 +1,12 @@
-# Securo Architecture Master: Technical Reference Manual
+# Securo Architecture Master: Technical Reference Manual (Historical Upstream Reference)
 
-> **Document Version:** 1.0.0  
+> **HISTORICAL REFERENCE NOTICE:**  
+> This document is an archived historical technical architecture reference from the upstream **Securo** project (`v0.15.0`). It is retained for open-source architectural reference and provenance tracking under the GNU AGPL-3.0.  
+> **For the active AdaptiveAI Finance Controller project, please refer to the root [README.md](../../README.md) and [docs/ARCHITECTURE.md](../ARCHITECTURE.md).**
+
+> **Document Version:** 1.0.0 (Upstream)  
 > **Target System:** Securo Finance Manager (`v0.15.0`)  
-> **Classification:** Authoritative Technical Knowledge Base & Architectural Reference  
-> **Prepared For:** Senior Engineering, AI System Integrators, and Autonomous Agent Teams
+> **Classification:** Upstream Open-Source Architectural Reference  
 
 ---
 

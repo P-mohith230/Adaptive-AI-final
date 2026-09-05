@@ -1,7 +1,8 @@
 {
-  "name": "frontend",
+  "name": "adaptiveai-finance-controller-frontend",
+  "description": "AdaptiveAI Finance Controller - AI-Powered Merchant Financial Reconciliation Platform",
   "private": true,
-  "version": "0.15.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -14,7 +14,7 @@ CREDENTIALS_DIRECTORY: list[Path] = [
 
 class Settings(BaseSettings):
     # App
-    app_name: str = "Securo"
+    app_name: str = "AdaptiveAI Finance Controller"
     debug: bool = False
 
     # Database
@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:5173"
 
     # WebAuthn / passkeys
-    webauthn_rp_name: str = "Securo"
+    webauthn_rp_name: str = "AdaptiveAI Finance"
     # Empty means the RP ID follows the domain the browser is on, which is what
     # most deployments want. Set it to pin passkeys to one domain (e.g.
     # securo.example.com); requests from other origins are then rejected.

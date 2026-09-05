@@ -1,4 +1,4 @@
-# Securo AdaptiveAI Finance Controller — Video Recordings & Narration
+# AdaptiveAI Finance Controller — Video Recordings & Narration
 
 This folder contains standard **Full HD MP4 video files** (`.mp4`) and the 5-minute ElevenLabs voiceover script for presentations, pitches, and submissions.
 

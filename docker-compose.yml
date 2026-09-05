@@ -12,7 +12,7 @@ x-backend-env: &backend-env
   SECRET_KEY: ${SECRET_KEY:-dev-secret-change-in-production}
   DEBUG: ${DEBUG:-true}
   FRONTEND_URL: ${FRONTEND_URL:-http://localhost:${FRONTEND_PORT:-3000}}
-  WEBAUTHN_RP_NAME: ${WEBAUTHN_RP_NAME:-Securo}
+  WEBAUTHN_RP_NAME: ${WEBAUTHN_RP_NAME:-AdaptiveAI Finance}
   WEBAUTHN_RP_ID: ${WEBAUTHN_RP_ID:-}
   WEBAUTHN_ORIGIN: ${WEBAUTHN_ORIGIN:-}
   PLUGGY_CLIENT_ID: ${PLUGGY_CLIENT_ID:-}

@@ -98,20 +98,7 @@ jobs:
         id: coverage
         run: |
           COVERAGE=$(python -c "import xml.etree.ElementTree as ET; print(round(float(ET.parse('coverage.xml').getroot().attrib['line-rate']) * 100))")
-          echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
-
-      - name: Update coverage badge
-        if: github.repository == 'securo-finance/securo' && github.ref == 'refs/heads/main' && steps.backend-changes.outputs.run_backend == 'true'
-        uses: schneegans/dynamic-badges-action@v1.9.0
-        with:
-          auth: ${{ secrets.GIST_TOKEN }}
-          gistID: ae627b744aaa2ba89d850ea541c311be
-          filename: coverage.json
-          label: coverage
-          message: ${{ steps.coverage.outputs.percentage }}%
-          valColorRange: ${{ steps.coverage.outputs.percentage }}
-          minColorRange: 50
-          maxColorRange: 90
+          echo "Coverage: $COVERAGE%"
 
   migration-chain:
     name: Migration Chain

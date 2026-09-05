@@ -1,4 +1,4 @@
-# AI Agent Technical Context & Operating Guidelines: Securo
+# AI Agent Technical Context & Operating Guidelines: AdaptiveAI Finance Controller
 
 > **Audience:** Autonomous AI coding agents, code generation models, and pair programmers.  
 > **Purpose:** Authoritative rules, conventions, invariants, and guardrails to prevent regressions and maintain codebase integrity.
@@ -7,7 +7,7 @@
 
 ## 1. Project Purpose & High-Level Architecture
 
-Securo is a privacy-first, self-hosted financial manager written in **Python (FastAPI + SQLAlchemy 2.0)** on the backend and **React 19 (TypeScript + Vite + Tailwind CSS v4)** on the frontend. It uses **PostgreSQL (with pgvector)** for relational and vector data, and **Redis + Celery** for asynchronous task execution.
+AdaptiveAI Finance Controller is an enterprise-grade merchant reconciliation, exception investigation, and settlement platform built on the FastAPI + React open-source foundation (derived from Securo). It uses **PostgreSQL** for relational financial data, **Redis** for idempotency caching and Celery tasks, and **Groq Llama-3.3-70b** for contextual AI exception investigation.
 
 Every record in Securo belongs to a **Workspace** (`personal` or `business`), and tenant isolation is enforced at the service and query layers via `workspace_id`.
 
