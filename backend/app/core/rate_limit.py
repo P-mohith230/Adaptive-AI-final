@@ -1,8 +1,11 @@
+import logging
 import time
 
 from fastapi import HTTPException, Request
 
 from app.core.redis import get_redis
+
+logger = logging.getLogger(__name__)
 
 
 class RateLimiter:
@@ -14,26 +17,32 @@ class RateLimiter:
         client_ip = request.client.host if request.client else "unknown"
         key = f"rate_limit:{request.url.path}:{client_ip}"
 
-        r = await get_redis()
-        now = time.time()
-        window_start = now - self.window_seconds
+        try:
+            r = await get_redis()
+            now = time.time()
+            window_start = now - self.window_seconds
 
-        pipe = r.pipeline()
-        pipe.zremrangebyscore(key, 0, window_start)
-        pipe.zcard(key)
-        pipe.zadd(key, {str(now): now})
-        pipe.expire(key, self.window_seconds)
-        results = await pipe.execute()
+            pipe = r.pipeline()
+            pipe.zremrangebyscore(key, 0, window_start)
+            pipe.zcard(key)
+            pipe.zadd(key, {str(now): now})
+            pipe.expire(key, self.window_seconds)
+            results = await pipe.execute()
 
-        request_count = results[1]
+            request_count = results[1]
 
-        if request_count >= self.max_requests:
-            retry_after = self.window_seconds
-            raise HTTPException(
-                status_code=429,
-                detail="Too many requests",
-                headers={"Retry-After": str(retry_after)},
-            )
+            if request_count >= self.max_requests:
+                retry_after = self.window_seconds
+                raise HTTPException(
+                    status_code=429,
+                    detail="Too many requests",
+                    headers={"Retry-After": str(retry_after)},
+                )
+        except HTTPException:
+            raise
+        except Exception as exc:
+            # Gracefully fail open when Redis is offline/unconfigured so user requests are not blocked
+            logger.debug(f"Rate limiting skipped due to Redis unavailability: {exc}")
 
 
 login_rate_limit = RateLimiter(max_requests=5, window_seconds=60)
