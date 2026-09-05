@@ -33,14 +33,22 @@ export type NavItem =
   | { type: 'link'; key: string; path: string; icon: React.ElementType; module: ModuleId }
   | { type: 'separator'; labelKey: string }
 
-export const navItems: NavItem[] = [
-  // Flagship Razorpay Track 04 Controller Module
-  { type: 'separator', labelKey: 'nav.groupFinanceController' },
-  { type: 'link', key: 'controlCenter', path: '/control-center', icon: ShieldCheck, module: 'reconciliation' },
-  { type: 'link', key: 'reconciliation', path: '/reconciliation', icon: Scale, module: 'reconciliation' },
-  { type: 'link', key: 'merchantLedger', path: '/merchant-ledger', icon: FileSpreadsheet, module: 'merchant_ledger' },
-  { type: 'link', key: 'auditTrail', path: '/audit-trail', icon: History, module: 'reconciliation' },
+export type ControllerNavItem =
+  | { type: 'link'; key: string; path: string; icon: React.ElementType }
+  | { type: 'separator'; labelKey: string }
 
+/**
+ * Flagship AdaptiveAI Finance Controller destinations (always visible).
+ */
+export const controllerNavItems: ControllerNavItem[] = [
+  { type: 'separator', labelKey: 'nav.groupFinanceController' },
+  { type: 'link', key: 'controlCenter', path: '/control-center', icon: ShieldCheck },
+  { type: 'link', key: 'reconciliation', path: '/reconciliation', icon: Scale },
+  { type: 'link', key: 'merchantLedger', path: '/merchant-ledger', icon: FileSpreadsheet },
+  { type: 'link', key: 'auditTrail', path: '/audit-trail', icon: History },
+]
+
+export const navItems: NavItem[] = [
   { type: 'separator', labelKey: 'nav.groupAccounts' },
   { type: 'link', key: 'transactions', path: '/transactions', icon: ArrowLeftRight, module: 'transactions' },
   { type: 'link', key: 'invoices', path: '/invoices', icon: Receipt, module: 'invoices' },

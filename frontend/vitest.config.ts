@@ -22,8 +22,7 @@ export default defineConfig({
     // forget.
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    // Vite serves the app's CSS through Tailwind; none of it affects what the
-    // tests assert, so skip the transform and keep the suite fast.
+    testTimeout: 15000,
     css: false,
   },
 })

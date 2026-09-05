@@ -83,9 +83,11 @@ class AIControllerService:
             abs_diff = abs(amt_diff)
             classification = "AMOUNT_MISMATCH"
             confidence = Decimal("0.9820")
+            expected_amt_str = f"₹{ledger.expected_amount:,.2f}" if ledger else "₹0.00"
+            captured_amt_str = f"₹{payment.amount:,.2f}" if payment else "₹0.00"
             reason = (
-                f"Merchant ledger expected ₹{ledger.expected_amount:,.2f} for order {record.order_id}, "
-                f"but Razorpay captured ₹{payment.amount:,.2f}. Numerical variance of ₹{abs_diff:,.2f} ({direction})."
+                f"Merchant ledger expected {expected_amt_str} for order {record.order_id}, "
+                f"but Razorpay captured {captured_amt_str}. Numerical variance of ₹{abs_diff:,.2f} ({direction})."
             )
             recommendation = (
                 "Verify order pricing in merchant system or check if a partial promo code / coupon was applied at checkout."
@@ -95,9 +97,11 @@ class AIControllerService:
             fee_diff = record.fee_delta
             classification = "FEE_DISCREPANCY"
             confidence = Decimal("0.9780")
+            expected_fee_str = f"₹{ledger.expected_fee:,.2f}" if ledger else "₹0.00"
+            captured_fee_str = f"₹{payment.fee:,.2f}" if payment else "₹0.00"
             reason = (
-                f"Merchant ledger calculated expected fee of ₹{ledger.expected_fee:,.2f}, "
-                f"while Razorpay deducted ₹{payment.fee:,.2f} (delta: ₹{abs(fee_diff):,.2f}). "
+                f"Merchant ledger calculated expected fee of {expected_fee_str}, "
+                f"while Razorpay deducted {captured_fee_str} (delta: ₹{abs(fee_diff):,.2f}). "
                 f"Likely international card processing surcharge or dynamic MDR band."
             )
             recommendation = "Accept Razorpay MDR fee delta and post adjustment to gateway processing fee expense ledger."
@@ -105,9 +109,11 @@ class AIControllerService:
         elif status == "MISSING_SETTLEMENT":
             classification = "MISSING_SETTLEMENT"
             confidence = Decimal("0.9650")
+            amt_str = f" (₹{payment.amount:,.2f})" if payment else ""
+            date_str = payment.transaction_time.strftime("%b %d") if (payment and payment.transaction_time) else "recorded date"
             reason = (
-                f"Payment {record.payment_id} (₹{payment.amount:,.2f}) was captured successfully on "
-                f"{payment.transaction_time.strftime('%b %d')}, but no bank payout has been credited after 3+ business days."
+                f"Payment {record.payment_id}{amt_str} was captured successfully on "
+                f"{date_str}, but no bank payout has been credited after 3+ business days."
             )
             recommendation = "Raise priority inquiry with Razorpay Merchant Support referencing Payment ID for pending settlement UTR."
 
@@ -132,8 +138,9 @@ class AIControllerService:
         elif status == "MISSING_PAYMENT":
             classification = "MISSING_PAYMENT"
             confidence = Decimal("0.9500")
+            expected_amt_str = f"₹{ledger.expected_amount:,.2f}" if ledger else "₹0.00"
             reason = (
-                f"Order {record.order_id} exists in merchant ledger with expected revenue of ₹{ledger.expected_amount:,.2f}, "
+                f"Order {record.order_id} exists in merchant ledger with expected revenue of {expected_amt_str}, "
                 f"but no corresponding gateway transaction was recorded in Razorpay."
             )
             recommendation = "Check if checkout was abandoned before payment authorization or if order was paid via alternate channel."

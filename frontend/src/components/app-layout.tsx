@@ -33,7 +33,7 @@ import { ShellLogo } from '@/components/shell-logo'
 import { UpdateAvailableBanner } from '@/components/update-available-banner'
 import { UpdateAvailableDialog } from '@/components/update-available-dialog'
 import { WorkspaceSwitcher } from '@/components/workspace-switcher'
-import { navItems, visibleNavItems, type NavItem } from '@/lib/nav-items'
+import { navItems, visibleNavItems, controllerNavItems, type NavItem } from '@/lib/nav-items'
 import {
   Menu,
   ChevronRight,
@@ -366,15 +366,51 @@ export function AppLayout() {
                 so until the workspace list lands there is no honest answer
                 — a placeholder beats both an empty sidebar and a guess. */}
             {workspaceLoading && <NavSkeleton />}
-            {!workspaceLoading && finalNavItems.map((item, idx) => {
+            {!workspaceLoading && controllerNavItems.map((item, idx) => {
               if (item.type === 'separator') {
-                // The first separator sits right below the search bar
-                // — without trimming the top padding it leaves a wide
-                // gap that makes the section header feel disconnected
-                // from the search trigger.
                 const isFirstSep = idx === 0
                 return (
-                  <div key={`sep-${idx}`} className={cn(isFirstSep ? 'pt-1 pb-1 px-3' : 'pt-3 pb-1 px-3')}>
+                  <div key={`c-sep-${idx}`} className={cn(isFirstSep ? 'pt-1 pb-1 px-3' : 'pt-3 pb-1 px-3')}>
+                    <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-sidebar-muted/50">
+                      {t(item.labelKey)}
+                    </span>
+                  </div>
+                )
+              }
+
+              const isActive =
+                item.path === '/control-center'
+                  ? (location.pathname === '/' || location.pathname === '/control-center')
+                  : location.pathname.startsWith(item.path)
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.key}
+                  to={item.path}
+                  data-tour={`nav-${item.key}`}
+                  onClick={() => setSidebarOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 text-[13px] font-medium transition-all rounded-lg px-3 py-2',
+                    isActive
+                      ? 'bg-primary/[0.08] text-primary border-l-[3px] border-primary pl-[9px]'
+                      : 'text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground',
+                  )}
+                >
+                  <Icon
+                    size={17}
+                    className={cn(
+                      'shrink-0',
+                      isActive ? 'text-primary' : 'text-sidebar-muted',
+                    )}
+                  />
+                  <span>{t(`nav.${item.key}`)}</span>
+                </Link>
+              )
+            })}
+            {!workspaceLoading && finalNavItems.map((item, idx) => {
+              if (item.type === 'separator') {
+                return (
+                  <div key={`sep-${idx}`} className="pt-3 pb-1 px-3">
                     <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-sidebar-muted/50">
                       {t(item.labelKey)}
                     </span>

@@ -253,15 +253,19 @@ User Query:
         order_match = re.search(r"(\d{4})", question)
         if order_match:
             num = order_match.group(1)
-            target = next((r for r in records if num in r.order_id), None)
+            target = next((r for r in records if r.order_id and num in r.order_id), None)
             if target:
                 reason = target.exception.reason if target.exception else "No anomaly recorded."
                 rec_action = target.exception.recommendation if target.exception else "Auto-reconciled cleanly."
+                amt_delta = target.amount_delta if target.amount_delta is not None else Decimal("0.00")
+                fin_impact = target.financial_impact if target.financial_impact is not None else Decimal("0.00")
+                base_amt = Decimal("0.00") if target.payment_transaction_id is not None else fin_impact
+                expected_amount_est = amt_delta + base_amt
                 answer = (
                     f"**Audit Finding for Order {target.order_id}:**\n"
                     f"- **Reconciliation Status:** `{target.status}`\n"
-                    f"- **Expected (Merchant Ledger):** ₹{target.amount_delta + (target.payment_transaction_id and Decimal('0') or target.financial_impact):,.2f}\n"
-                    f"- **Financial Exposure:** ₹{target.financial_impact:,.2f}\n"
+                    f"- **Expected (Merchant Ledger):** ₹{expected_amount_est:,.2f}\n"
+                    f"- **Financial Exposure:** ₹{fin_impact:,.2f}\n"
                     f"- **Diagnosis:** {reason}\n"
                     f"- **Recommended Controller Action:** {rec_action}"
                 )

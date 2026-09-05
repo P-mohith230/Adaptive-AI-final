@@ -59,8 +59,6 @@ class ModuleId(str, Enum):
     SPLIT_GROUPS = "split_groups"
     RULES = "rules"
     INVOICES = "invoices"
-    RECONCILIATION = "reconciliation"
-    MERCHANT_LEDGER = "merchant_ledger"
 
 
 @dataclass(frozen=True)
@@ -89,8 +87,6 @@ CATALOG: Mapping[ModuleId, ModuleSpec] = {
         ModuleSpec(ModuleId.SPLIT_GROUPS, default_enabled=True),
         ModuleSpec(ModuleId.RULES, default_enabled=True),
         ModuleSpec(ModuleId.INVOICES, default_enabled=False),
-        ModuleSpec(ModuleId.RECONCILIATION, default_enabled=True),
-        ModuleSpec(ModuleId.MERCHANT_LEDGER, default_enabled=True),
     )
 }
 
