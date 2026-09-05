@@ -164,15 +164,16 @@ class Settings(BaseSettings):
             parsed = urlparse(url)
             if parsed.query:
                 qs = parse_qs(parsed.query)
-                new_qs = {}
+                needs_ssl = False
                 for k, v in qs.items():
-                    if k in ("sslmode", "ssl"):
+                    if k.lower() in ("sslmode", "ssl"):
                         val = v[0] if v else ""
                         if val.lower() in ("require", "verify-full", "verify-ca", "prefer", "true", "1"):
-                            new_qs["ssl"] = ["require"]
-                    elif k not in ("channel_binding", "endpoint", "target_session_attrs", "gssencmode", "options", "pool_timeout"):
-                        new_qs[k] = v
-                url = urlunparse(parsed._replace(query=urlencode(new_qs, doseq=True)))
+                            needs_ssl = True
+                    elif "ssl" in k.lower() or "require" in str(v).lower():
+                        needs_ssl = True
+                new_query = "ssl=require" if needs_ssl else ""
+                url = urlunparse(parsed._replace(query=new_query))
         except Exception:
             pass
 
