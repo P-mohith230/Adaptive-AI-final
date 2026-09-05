@@ -1,7 +1,6 @@
 import base64
 import logging
 import os
-from decimal import Decimal
 from typing import Any, Optional
 
 import httpx

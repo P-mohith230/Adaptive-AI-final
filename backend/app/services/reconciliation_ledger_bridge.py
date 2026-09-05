@@ -1,7 +1,7 @@
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, timedelta
 from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from sqlalchemy import delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,8 +14,6 @@ from app.models.canonical_transaction import CanonicalTransaction
 from app.models.reconciliation import (
     ReconciliationBatch,
     ReconciliationRecord,
-    ReconciliationException,
-    ReconciliationAuditLog,
 )
 from app.models.transaction import Transaction
 
@@ -273,7 +271,7 @@ class ReconciliationLedgerBridge:
                         type="debit",
                         source="sync",
                         status="posted",
-                        notes=f"Settlement payout transferred to HDFC Bank A/C",
+                        notes="Settlement payout transferred to HDFC Bank A/C",
                     )
                     # Bank leg (credit)
                     tx_transfer_in = Transaction(

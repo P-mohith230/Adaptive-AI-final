@@ -14,7 +14,6 @@ from sqlalchemy.orm import selectinload
 from app.core.config import get_settings
 from app.models.reconciliation import (
     ReconciliationBatch,
-    ReconciliationException,
     ReconciliationRecord,
 )
 from app.services.reconciliation_ledger_bridge import ReconciliationLedgerBridge
@@ -223,12 +222,12 @@ User Query:
         if any(w in question_lower for w in ["who are you", "what can you do", "what are you", "your name"]):
             return {
                 "answer": (
-                    f"I am the **AdaptiveAI Finance Controller** for Securo.\n\n"
-                    f"I autonomously close the finance-operations loop for merchant payment processing via Razorpay by:\n"
-                    f"1. **Reconciling 3-way transactions** (Merchant Orders vs. Gateway captured payments vs. Bank MT940 credits).\n"
-                    f"2. **Diagnosing root causes** for fee discrepancies, missing settlements, and timing differences.\n"
-                    f"3. **Providing real-time liquidity forecasting** and exposure prioritization with zero arithmetic hallucinations.\n\n"
-                    f"Ask me about any specific order (e.g. `order_DEMO_1012`), fee deductions, or current cash positions."
+                    "I am the **AdaptiveAI Finance Controller** for Securo.\n\n"
+                    "I autonomously close the finance-operations loop for merchant payment processing via Razorpay by:\n"
+                    "1. **Reconciling 3-way transactions** (Merchant Orders vs. Gateway captured payments vs. Bank MT940 credits).\n"
+                    "2. **Diagnosing root causes** for fee discrepancies, missing settlements, and timing differences.\n"
+                    "3. **Providing real-time liquidity forecasting** and exposure prioritization with zero arithmetic hallucinations.\n\n"
+                    "Ask me about any specific order (e.g. `order_DEMO_1012`), fee deductions, or current cash positions."
                 ),
                 "provider": "AI Finance Controller (Deterministic Engine)",
                 "sources": ["Securo Multi-Source Ledger"],

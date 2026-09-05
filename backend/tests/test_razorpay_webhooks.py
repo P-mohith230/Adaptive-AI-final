@@ -6,7 +6,6 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.integrations.razorpay.webhooks import RazorpayWebhookHandler
-from app.models.reconciliation import RazorpayWebhookEvent
 
 
 @pytest.mark.asyncio

@@ -3,15 +3,13 @@ from decimal import Decimal
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
-from app.models.workspace import Workspace, WorkspaceMember
+from app.models.workspace import Workspace
 from app.services.evaluation_service import EvaluationService
 
 
 @pytest.mark.asyncio
 async def test_50_record_evaluation_batch(session: AsyncSession):
     # Setup workspace
-    user_id = uuid.uuid4()
     ws_id = uuid.uuid4()
 
     ws = Workspace(

@@ -5,7 +5,7 @@ import random
 import uuid
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession

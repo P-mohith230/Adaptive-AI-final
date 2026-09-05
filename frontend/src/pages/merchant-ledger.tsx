@@ -62,14 +62,14 @@ export default function MerchantLedgerPage() {
       queryClient.invalidateQueries({ queryKey: ['merchant-ledger-entries'] })
       queryClient.invalidateQueries({ queryKey: ['reconciliation-records'] })
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Sync failed', { description: err.message })
     },
   })
 
   // 3. Create Entry Mutation
   const createMutation = useMutation({
-    mutationFn: (payload: any) => merchantLedger.createEntry(payload),
+    mutationFn: (payload: Record<string, unknown>) => merchantLedger.createEntry(payload),
     onSuccess: () => {
       toast.success('Expected order added to merchant ledger')
       queryClient.invalidateQueries({ queryKey: ['merchant-ledger-entries'] })

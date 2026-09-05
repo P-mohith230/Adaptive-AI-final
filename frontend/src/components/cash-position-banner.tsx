@@ -37,7 +37,7 @@ export function CashPositionBanner({ showSyncButton = true }: { showSyncButton?:
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Sync failed', { description: err.message })
     },
   })

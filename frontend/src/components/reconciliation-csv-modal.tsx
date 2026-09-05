@@ -33,6 +33,17 @@ interface ReconciliationCsvModalProps {
   onOpenChange: (open: boolean) => void
 }
 
+interface ModalBatchResult {
+  match_rate?: string | number
+  total_records?: number
+  matched_records?: number
+  unresolved_count?: number
+  ledger_sync?: {
+    synced_clean?: number
+    synced_exceptions?: number
+  }
+}
+
 export function ReconciliationCsvModal({ open, onOpenChange }: ReconciliationCsvModalProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -42,7 +53,7 @@ export function ReconciliationCsvModal({ open, onOpenChange }: ReconciliationCsv
   const [ordersFile, setOrdersFile] = useState<File | null>(null)
   const [paymentsFile, setPaymentsFile] = useState<File | null>(null)
   const [bankFile, setBankFile] = useState<File | null>(null)
-  const [resultData, setResultData] = useState<any | null>(null)
+  const [resultData, setResultData] = useState<ModalBatchResult | null>(null)
 
   // 1. Download sample CSV files
   const downloadSampleMutation = useMutation({
@@ -74,7 +85,7 @@ export function ReconciliationCsvModal({ open, onOpenChange }: ReconciliationCsv
 
       toast.success('3 Sample CSV templates downloaded successfully!')
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Failed to download sample templates', { description: err.message })
     },
   })
@@ -102,7 +113,7 @@ export function ReconciliationCsvModal({ open, onOpenChange }: ReconciliationCsv
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Batch generation failed', { description: err.message })
     },
   })
@@ -133,7 +144,7 @@ export function ReconciliationCsvModal({ open, onOpenChange }: ReconciliationCsv
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Upload failed', { description: err.message })
     },
   })
@@ -236,7 +247,7 @@ export function ReconciliationCsvModal({ open, onOpenChange }: ReconciliationCsv
           </Card>
         )}
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'generate' | 'upload')} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="generate">Instant 50+ Synthetic Batch</TabsTrigger>
             <TabsTrigger value="upload">Upload Custom CSV Files</TabsTrigger>

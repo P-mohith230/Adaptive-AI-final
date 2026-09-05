@@ -85,7 +85,7 @@ export default function ReconciliationPage() {
       queryClient.invalidateQueries({ queryKey: ['reconciliation-kpi'] })
       setSelectedRecordId(null)
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Review action failed', { description: err.message })
     },
   })

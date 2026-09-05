@@ -23,6 +23,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { reconciliation } from '@/lib/api'
 
+interface ImportBatchResult {
+  match_rate?: string | number
+  total_records?: number
+  matched_records?: number
+  unresolved_count?: number
+  ledger_sync?: {
+    synced_clean?: number
+    synced_exceptions?: number
+  }
+}
+
 export function ReconciliationBatchImportPanel() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -32,7 +43,7 @@ export function ReconciliationBatchImportPanel() {
   const [ordersFile, setOrdersFile] = useState<File | null>(null)
   const [paymentsFile, setPaymentsFile] = useState<File | null>(null)
   const [bankFile, setBankFile] = useState<File | null>(null)
-  const [resultData, setResultData] = useState<any | null>(null)
+  const [resultData, setResultData] = useState<ImportBatchResult | null>(null)
 
   // 1. Download sample CSV files
   const downloadSampleMutation = useMutation({
@@ -57,7 +68,7 @@ export function ReconciliationBatchImportPanel() {
 
       toast.success('Sample CSV templates downloaded successfully!')
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Failed to download templates', { description: err.message })
     },
   })
@@ -84,7 +95,7 @@ export function ReconciliationBatchImportPanel() {
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Batch generation failed', { description: err.message })
     },
   })
@@ -114,7 +125,7 @@ export function ReconciliationBatchImportPanel() {
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Upload failed', { description: err.message })
     },
   })
@@ -198,7 +209,7 @@ export function ReconciliationBatchImportPanel() {
       )}
 
       {/* Main Tabs */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'generate' | 'upload')} className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="generate">Instant 50+ Synthetic Batch</TabsTrigger>
           <TabsTrigger value="upload">Upload Custom CSV Files</TabsTrigger>

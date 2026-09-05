@@ -155,10 +155,11 @@ export function ControllerChatDialog({
           },
         ])
       }
-    } catch (err: any) {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: `Unable to query financial records: ${err.message}` },
+        { role: 'assistant', content: `Unable to query financial records: ${message}` },
       ])
     } finally {
       setLoading(false)

@@ -1,11 +1,9 @@
 import uuid
-from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.models.canonical_transaction import CanonicalTransaction
 from app.models.merchant_ledger import MerchantLedgerEntry
@@ -90,7 +88,7 @@ class AIControllerService:
                 f"but Razorpay captured ₹{payment.amount:,.2f}. Numerical variance of ₹{abs_diff:,.2f} ({direction})."
             )
             recommendation = (
-                f"Verify order pricing in merchant system or check if a partial promo code / coupon was applied at checkout."
+                "Verify order pricing in merchant system or check if a partial promo code / coupon was applied at checkout."
             )
 
         elif status == "FEE_DISCREPANCY":
@@ -175,7 +173,7 @@ class AIControllerService:
         ledgers = {}
         if ledger_ids:
             l_res = await session.execute(select(MerchantLedgerEntry).where(MerchantLedgerEntry.id.in_(ledger_ids)))
-            ledgers = {l.id: l for l in l_res.scalars().all()}
+            ledgers = {entry.id: entry for entry in l_res.scalars().all()}
 
         txs = {}
         if tx_ids:

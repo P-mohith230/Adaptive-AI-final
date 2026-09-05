@@ -1,6 +1,6 @@
 import time
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Optional
 
@@ -196,7 +196,6 @@ class ReconciliationService:
 
         total_count = len(ledger_entries)
         auto_reconciled = 0
-        ai_assisted = 0
         unresolved = 0
         total_exposure = Decimal("0.00")
         records_to_add: list[ReconciliationRecord] = []

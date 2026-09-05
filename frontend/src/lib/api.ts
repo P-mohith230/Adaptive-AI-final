@@ -1951,7 +1951,7 @@ export const merchantLedger = {
     const { data } = await api.get('/ledger/entries', { params })
     return data
   },
-  createEntry: async (payload: any) => {
+  createEntry: async (payload: Record<string, unknown>) => {
     const { data } = await api.post('/ledger/entries', payload)
     return data
   },

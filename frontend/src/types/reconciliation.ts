@@ -24,7 +24,7 @@ export interface ReconciliationException {
   ai_classification: string
   confidence: string | number
   reason: string
-  evidence_json?: Record<string, any>
+  evidence_json?: Record<string, unknown>
   recommendation: string
   review_status: string
   reviewed_at?: string
@@ -40,7 +40,7 @@ export interface ReconciliationRecord {
   status: string
   amount_delta: string | number
   fee_delta: string | number
-  checks_json?: Record<string, any>
+  checks_json?: Record<string, unknown>
   priority_score: string | number
   financial_impact: string | number
   resolution_status: string
@@ -55,7 +55,7 @@ export interface ReconciliationAuditLog {
   actor: string
   decision: string
   reason: string
-  evidence_json?: Record<string, any>
+  evidence_json?: Record<string, unknown>
   confidence?: string | number
   agent_version: string
   previous_state?: string
@@ -133,7 +133,7 @@ export interface MerchantLedgerEntry {
   expected_status: string
   transaction_date: string
   source: string
-  metadata_json?: Record<string, any>
+  metadata_json?: Record<string, unknown>
   created_at: string
   updated_at: string
 }

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +16,6 @@ from app.models.merchant_ledger import MerchantLedgerEntry
 from app.models.reconciliation import (
     ReconciliationAuditLog,
     ReconciliationBatch,
-    ReconciliationException,
     ReconciliationRecord,
 )
 from app.schemas.reconciliation import (

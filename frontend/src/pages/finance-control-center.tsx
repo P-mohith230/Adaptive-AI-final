@@ -84,7 +84,7 @@ export default function FinanceControlCenterPage() {
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error('Reconciliation run failed', { description: err.message || 'Unknown error' })
     },
   })
