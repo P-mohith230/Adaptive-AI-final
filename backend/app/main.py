@@ -3,8 +3,9 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api.accounts import router as accounts_router
 from app.api.budgets import router as budgets_router
@@ -252,6 +253,42 @@ if os.getenv("AGENTS_ENABLED", "false").strip().lower() in ("1", "true", "yes", 
         logger.exception("Agents feature flag is on but import failed; routes not mounted")
 
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception(f"Unhandled error handling {request.method} {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": f"{type(exc).__name__}: {str(exc)}",
+            "path": request.url.path,
+        },
+    )
+
+
 @app.get("/api/health")
 async def health_check():
-    return {"status": "healthy"}
+    import re
+    from sqlalchemy import text
+    from app.core.config import get_settings
+    from app.core.database import async_session_maker
+
+    settings = get_settings()
+    masked_url = re.sub(r"://([^:]+):([^@]+)@", r"://\1:***@", settings.database_url)
+
+    db_status = "connected"
+    db_error = None
+    try:
+        async with async_session_maker() as session:
+            await session.execute(text("SELECT 1"))
+    except Exception as exc:
+        db_status = "error"
+        db_error = f"{type(exc).__name__}: {exc}"
+
+    return {
+        "status": "healthy" if db_status == "connected" else "database_error",
+        "database": {
+            "status": db_status,
+            "url_masked": masked_url,
+            "error": db_error,
+        },
+    }

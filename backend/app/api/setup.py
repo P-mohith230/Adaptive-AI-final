@@ -28,9 +28,27 @@ class CreateAdminRequest(BaseModel):
 
 @router.get("/status", response_model=SetupStatus)
 async def get_setup_status(session: AsyncSession = Depends(get_async_session)):
-    result = await session.execute(select(func.count(User.id)))
-    count = result.scalar() or 0
-    return SetupStatus(has_users=count > 0)
+    try:
+        result = await session.execute(select(func.count(User.id)))
+        count = result.scalar() or 0
+        return SetupStatus(has_users=count > 0)
+    except Exception:
+        # Tables may not exist yet; auto-initialize schema
+        try:
+            from app.core.database import Base, engine
+            from app import models as _app_models  # noqa: F401
+            from app.agents import models as _agent_models  # noqa: F401
+
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            result = await session.execute(select(func.count(User.id)))
+            count = result.scalar() or 0
+            return SetupStatus(has_users=count > 0)
+        except Exception as inner_exc:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Database connection error: {inner_exc}",
+            )
 
 
 @router.post("/create-admin", dependencies=[Depends(require_local_auth_enabled)])

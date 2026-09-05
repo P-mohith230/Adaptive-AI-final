@@ -140,8 +140,12 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def normalize_database_url(self) -> "Settings":
+        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
         # Prioritize real cloud connection strings over local/default URLs
         candidates = [
+            getenv("POSTGRES_PRISMA_URL"),
+            getenv("POSTGRES_URL_NON_POOLING"),
             getenv("POSTGRES_URL"),
             getenv("DATABASE_URL"),
             getenv("STORAGE_URL"),
@@ -155,8 +159,23 @@ class Settings(BaseSettings):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgresql://") and not url.startswith("postgresql+asyncpg://"):
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        if "sslmode=require" in url:
-            url = url.replace("sslmode=require", "ssl=require")
+
+        try:
+            parsed = urlparse(url)
+            if parsed.query:
+                qs = parse_qs(parsed.query)
+                new_qs = {}
+                for k, v in qs.items():
+                    if k in ("sslmode", "ssl"):
+                        val = v[0] if v else ""
+                        if val.lower() in ("require", "verify-full", "verify-ca", "prefer", "true", "1"):
+                            new_qs["ssl"] = ["require"]
+                    elif k not in ("channel_binding", "endpoint", "target_session_attrs", "gssencmode", "options", "pool_timeout"):
+                        new_qs[k] = v
+                url = urlunparse(parsed._replace(query=urlencode(new_qs, doseq=True)))
+        except Exception:
+            pass
+
         self.database_url = url
         return self
 
