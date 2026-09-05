@@ -35,12 +35,8 @@ async def get_setup_status(session: AsyncSession = Depends(get_async_session)):
     except Exception:
         # Tables may not exist yet; auto-initialize schema
         try:
-            from app.core.database import Base, engine
-            from app import models as _app_models  # noqa: F401
-            from app.agents import models as _agent_models  # noqa: F401
-
-            async with engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
+            from app.core.database import init_database_schema
+            await init_database_schema()
             result = await session.execute(select(func.count(User.id)))
             count = result.scalar() or 0
             return SetupStatus(has_users=count > 0)
