@@ -264,14 +264,6 @@ When evaluating a batch of 50+ transactions, AdaptiveAI Finance Controller repor
 3. **Strict Ground-Truth Grounding:** AI prompts are fed structured JSON records directly from the database; the model is constrained to facts present in the payload.
 
 ---
-
-## Open-Source Foundation
-
-**AdaptiveAI Finance Controller** is derived from and substantially extends the open-source **Securo** project.
-
-- **Original Project:** Securo (`https://github.com/securo-finance/securo`)
-- **Original License:** GNU Affero General Public License v3.0 (AGPL-3.0)
-
 ### Major Original Innovations Added by AdaptiveAI:
 - Razorpay Payment Gateway API integration and webhook idempotency.
 - Canonical merchant payment and ledger models.
