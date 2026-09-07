@@ -115,9 +115,3 @@ To maintain financial integrity, all contributors must adhere to the following n
 - All AI responses exposed in the UI must clearly indicate that they are AI-generated suggestions subject to human approval.
 
 ---
-
-## 10. Open-Source Attribution & License
-
-- AdaptiveAI Finance Controller is a derivative work based on the open-source **Securo** project (`https://github.com/securo-finance/securo`), licensed under **GNU AGPL-3.0**.
-- Contributors must respect upstream copyright notices and license obligations.
-- Do not claim independent authorship of upstream code. See [`docs/OPEN_SOURCE_ATTRIBUTION.md`](./docs/OPEN_SOURCE_ATTRIBUTION.md).
